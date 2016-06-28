@@ -9,7 +9,6 @@ from functools import reduce
 import tarfile
 import numpy as np
 import re
-from nltk.tokenize import sent_tokenize, word_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 class Model:
