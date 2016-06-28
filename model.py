@@ -18,6 +18,7 @@ class Model:
 		self.textX = textY
 		self.answerModel = None
 		self._input_encoder = None
+		self._question_encoder = None
 
 	def input_encoder(self, dropout=0.3):
 		# embed the input sequence into a sequence of vectors
@@ -27,6 +28,15 @@ class Model:
                               input_length=self.story_maxlen))
 		input_encoder_m.add(Dropout(dropout))
 		self._input_encoder = input_encoder
+
+	def question_encoder(self, dropout=0.3):
+		question_encoder = Sequential()
+		question_encoder.add(Embedding(input_dim=vocab_size,
+                               output_dim=64,
+                               input_length=query_maxlen))
+		question_encoder.add(Dropout(dropout))
+		self._question_encoder = question_encoder
+
 
 	def train(self, method='rmslprop'):
 		if self.answerModel is None:
@@ -40,14 +50,6 @@ class Model:
            	validation_data=([inputs_test, queries_test, inputs_test], answers_test))
 
 	def construct():
-		# output: (samples, story_maxlen, embedding_dim)
-		# embed the question into a sequence of vectors
-		question_encoder = Sequential()
-		question_encoder.add(Embedding(input_dim=vocab_size,
-                               output_dim=64,
-                               input_length=query_maxlen))
-		#question_encoder.add(Dropout(0.3))
-		question_encoder.add(Dropout(0.4))
 
 		match = Sequential()
 		match.add(Merge([input_encoder_m, question_encoder],
