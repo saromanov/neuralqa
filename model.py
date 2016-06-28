@@ -1,6 +1,6 @@
 from keras.models import Sequential
 from keras.layers.embeddings import Embedding
-from keras.layers import Activation, Dense, Merge, Permute, Dropout
+from keras.layers import Activation, Dense, Merge, Permute, Dropout, Layer
 from keras.layers.core import Highway
 from keras.layers import LSTM, GRU
 from keras.layers.advanced_activations import PReLU
@@ -17,6 +17,16 @@ class Model:
 		self.trainX = trainX
 		self.textX = textY
 		self.answerModel = None
+		self._input_encoder = None
+
+	def input_encoder(self, dropout=0.3):
+		# embed the input sequence into a sequence of vectors
+		input_encoder_m = Sequential()
+		input_encoder_m.add(Embedding(input_dim=self.vocab_size,
+                              output_dim=64,
+                              input_length=self.story_maxlen))
+		input_encoder_m.add(Dropout(dropout))
+		self._input_encoder = input_encoder
 
 	def train(self, method='rmslprop'):
 		if self.answerModel is None:
@@ -30,12 +40,6 @@ class Model:
            	validation_data=([inputs_test, queries_test, inputs_test], answers_test))
 
 	def construct():
-		# embed the input sequence into a sequence of vectors
-		input_encoder_m = Sequential()
-		input_encoder_m.add(Embedding(input_dim=vocab_size,
-                              output_dim=64,
-                              input_length=story_maxlen))
-		input_encoder_m.add(Dropout(0.3))
 		# output: (samples, story_maxlen, embedding_dim)
 		# embed the question into a sequence of vectors
 		question_encoder = Sequential()
